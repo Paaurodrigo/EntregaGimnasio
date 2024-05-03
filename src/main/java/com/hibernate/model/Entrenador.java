@@ -40,7 +40,7 @@ public class Entrenador {
 			return nomEntrenador;
 		}
 
-		public void setNomCiudad(String nomEntrenador) {
+		public void setNomEntrenador(String nomEntrenador) {
 			this.nomEntrenador = nomEntrenador;
 		}
 	

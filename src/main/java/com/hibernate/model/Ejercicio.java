@@ -41,12 +41,13 @@ public class Ejercicio {
 		super();
 	}
 	
-	public Ejercicio(String nomEjercicio, double peso,int series,int reps,String dificultad) {
+	public Ejercicio(String nomEjercicio, double peso,int series,int reps,String descanso,String dificultad) {
 		super();
 		this.nomEjercicio = nomEjercicio;
 		this.peso = peso;
 		this.series = series;
 		this.reps = reps;
+		this.descanso=descanso;
 		this.dificultad = dificultad;
 	}
 
