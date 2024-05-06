@@ -247,13 +247,13 @@ public class App {
      	modelEjercicio.addColumn("Dificultad"); 
      	
      	//Las tres tablas con los scrollpane
-     	
      	JTable tableClienteEjercicio = new JTable(modelClienteEjercicio);
      	frame.getContentPane().setLayout(null);
      	tableClienteEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		JScrollPane scrollPane3 = new JScrollPane(tableClienteEjercicio);
 		scrollPane3.setBounds(593, 498, 550, 196);
 		frame.getContentPane().add(scrollPane3);
+		
      	//Tabla entrenador
 		JTable tableEntrenador = new JTable(modelEntrenador);
 		tableEntrenador.addMouseListener(new MouseAdapter() {
@@ -608,6 +608,7 @@ public class App {
 				clienteDAO.deleteCliente(idCliente);
 				refrescarCliente();
 				limpiarCliente();
+				
 			}
 		});
 		btnBorrarCliente.setBounds(1060, 214, 157, 25);
@@ -646,22 +647,30 @@ public class App {
 	
 		
 		JButton btnAsignarRutina = new JButton("Añadir Ejercicio");
-		btnAsignarRutina.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+		btnAsignarRutina.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e2) {
+		
+				idCliente=Integer.parseInt(txtIdCliente.getText());
+				idEjercicio=Integer.parseInt(txtidEjercicio.getText());
+				
+				Cliente cliente=clienteDAO.selectClienteById(idCliente);
+				Ejercicio ejercicio = ejercicioDAO.selectEjercicioById(idEjercicio);		
+				
+				System.out.println(ejercicio.getIdEjercicio());
+				cliente.anyadirEjercicio(ejercicio);
+				clienteDAO.updateCliente(cliente);
+
 			}
 		});
 		btnAsignarRutina.setBounds(650, 706, 157, 25);
 		frame.getContentPane().add(btnAsignarRutina);
 		
 		JButton btnEliminarRutina = new JButton("Eliminar Ejercicio");
-		btnEliminarRutina.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-			}
-		});
 		btnEliminarRutina.setBounds(962, 706, 157, 25);
 		frame.getContentPane().add(btnEliminarRutina);
 		
-		//ACABAR
+	
 		
 		
 		JButton btnAsignarEntrenador = new JButton("Asignar Cliente");
@@ -672,10 +681,12 @@ public class App {
 				idCliente=Integer.parseInt(txtIdCliente.getText());
 				idEntrenador=Integer.parseInt(txtIdEntrenador.getText());
 				
-				Cliente cliente2=clienteDAO.selectClienteById(idCliente);				
-				cliente2.setIdEntrenador(idEntrenador);
+				Cliente cliente=clienteDAO.selectClienteById(idCliente);				
+				cliente.setIdEntrenador(idEntrenador);
+				clienteDAO.updateCliente(cliente);
 				refrescarCliente();
-				
+				limpiarCliente();
+				limpiarEntrenador();
 			}
 		});
 		btnAsignarEntrenador.setBounds(531, 50, 179, 25);
@@ -684,6 +695,18 @@ public class App {
 		
 		
 		JButton btnDesasignarCliente = new JButton("Desasignar Cliente");
+		btnDesasignarCliente.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				idCliente=Integer.parseInt(txtIdCliente.getText());
+				Cliente cliente=clienteDAO.selectClienteById(idCliente);				
+				cliente.setIdEntrenador(100000);
+				clienteDAO.updateCliente(cliente);
+				refrescarCliente();
+				limpiarCliente();
+				limpiarEntrenador();
+			}
+		});
 		btnDesasignarCliente.setBounds(531, 87, 179, 25);
 		frame.getContentPane().add(btnDesasignarCliente);
 		
@@ -725,9 +748,10 @@ public class App {
 		*/
 		
 		//Mostrar las tres tablas
-				refrescarEntrenador();
-				refrescarCliente();
-				refrescarEjercicio();
+		
+		refrescarCliente();
+		refrescarEjercicio();
+		refrescarEntrenador();
 		
 
 
