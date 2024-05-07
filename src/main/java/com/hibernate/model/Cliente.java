@@ -3,9 +3,11 @@ package com.hibernate.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Hibernate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,17 +42,17 @@ public class Cliente {
 	@Column(name = "idEntrenador")
 	private int idEntrenador;
 	
-	
-	@ManyToMany    //(cascade = CascadeType.ALL)
+
+	@ManyToMany(fetch=FetchType.EAGER)    //(cascade = CascadeType.ALL)
 	@JoinTable(
-			name="ejercicio_cliente",  //Se crea automaticamente...
+			name="clienteEjercicio",  //Se crea automaticamente...
 			joinColumns = @JoinColumn(name = "idCliente"),
 		    inverseJoinColumns = @JoinColumn(name = "idEjercicio")
 			  )
 	private List<Ejercicio> ejercicios=new ArrayList<Ejercicio>();
 	
-
-
+	
+	
 	public Cliente() {
 		super();
 	}
@@ -63,6 +65,7 @@ public class Cliente {
 		this.lesiones = lesiones;
 		this.objetivo = objetivo;
 		this.idEntrenador = idEntrenador;
+		this.ejercicios = null;
 	
 	}
 
@@ -121,12 +124,10 @@ public class Cliente {
 	public void setIdEntrenador(int idEntrenador) {
 		this.idEntrenador = idEntrenador;
 	}
-
 	public List<Ejercicio> getEjercicios() {
 		return ejercicios;
 	}
-
-	public void setEjercicios(List<Ejercicio> ejercicios) {
+	public void setEjercicio(List<Ejercicio> ejercicios) {
 		this.ejercicios = ejercicios;
 	}
 	
@@ -135,9 +136,10 @@ public class Cliente {
 		ej.getClientes().add(this);
 	}
 	
-	public void quitarProfesion(Ejercicio ej) {
+	public void quitarEjercicio(Ejercicio ej) {
 		this.ejercicios.remove(ej);
 		ej.getClientes().remove(this);
 	}
+	
 	
 }

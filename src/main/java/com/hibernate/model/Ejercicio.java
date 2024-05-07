@@ -2,8 +2,10 @@ package com.hibernate.model;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -17,7 +19,7 @@ import jakarta.persistence.Table;
 public class Ejercicio {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "idjercicio")
+	@Column(name = "idEjercicio")
 	private int idEjercicio;
 	
 	@Column(name = "Nombre")
@@ -38,14 +40,14 @@ public class Ejercicio {
 	@Column(name = "Dificultad")
 	private String dificultad;
 	
-	@ManyToMany   //(cascade = CascadeType.ALL)
+	
+	@ManyToMany  (fetch=FetchType.EAGER) 
 	@JoinTable(
-			name = "ejercicio_cliente", //Se crea automaticamente...
+			name = "clienteEjercicio", //Se crea automaticamente...
 			joinColumns = @JoinColumn(name = "idEjercicio"),
             inverseJoinColumns = @JoinColumn(name = "idCliente")
 			  )
 	private List<Cliente> clientes=new ArrayList<Cliente>();
-	
 	
 	
 	public Ejercicio() {
@@ -117,7 +119,6 @@ public class Ejercicio {
 	public void setDificultad(String dificultad) {
 		this.dificultad = dificultad;
 	}
-	
 	public List<Cliente> getClientes() {
 		return clientes;
 	}
@@ -134,7 +135,7 @@ public class Ejercicio {
 		this.clientes.remove(cl);
 		cl.getEjercicios().remove(this);
 	}
-
+	
 
 	
 }

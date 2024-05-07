@@ -28,6 +28,7 @@ import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
+import java.awt.Font;
 
 public class App {
 
@@ -43,6 +44,7 @@ public class App {
 	private EntrenadorDAO entrenadorDAO;
 	private ClienteDAO clienteDAO;
 	private EjercicioDAO ejercicioDAO;
+	private Cliente cliente;
 	private List <Entrenador> entrenadores;
 	private List <Cliente> clientes;
 	private List <Ejercicio> ejercicios;
@@ -62,6 +64,7 @@ public class App {
 	private JTextField txtIdEntrenador;
 	private JTextField txtidEjercicio;
 	private JTextField txtIdCliente;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -78,19 +81,42 @@ public class App {
 		});
 	}
 	
+	
+	
 	public void refrescarEntrenador() {
 		List<Entrenador> entrenadores= null;
 		modelEntrenador.setRowCount(0);
 		entrenadores = entrenadorDAO.selectAllEntrenador();
 		entrenadores.forEach(s->{
-			Object [] row = new Object [2];
+			Object [] row = new Object [3];
 			row [0]=s.getIdEntrenador();
 			row [1]=s.getNomEntrenador();
+			row [2]=s.getNumClientes();
 			modelEntrenador.addRow(row);
 		});
 		
 		
 	}
+	
+	public void refrescarClienteEjercicio(Cliente cliente) {
+		
+		List<Ejercicio> clientesEjer= null;
+		modelClienteEjercicio.setRowCount(0);
+		clientesEjer = cliente.getEjercicios();	
+		for(Ejercicio e : clientesEjer) {
+			Object [] row = new Object [5];
+			row[0]=e.getNomEjercicio();
+			row[1]=e.getPeso();
+			row[2]=e.getSeries();
+			row[3]=e.getReps();
+			row[4]=e.getDescanso();
+			modelClienteEjercicio.addRow(row);
+		}
+		
+		
+		
+	}
+	
 	public void refrescarCliente() {
 		List<Cliente> clientes= null;
 		modelCliente.setRowCount(0);
@@ -110,6 +136,8 @@ public class App {
 		
 		
 	}
+	
+	
 	
 	public void refrescarEjercicio() {
 		List<Ejercicio> ejercicios= null;
@@ -179,13 +207,16 @@ public class App {
 			String lesionesCliente;
 			String objCliente;
 			private JTable table;
+			private JTextField txtNumClientes;
+			int numClientes;
 			
 			
 	
 	private void initialize() {
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1250, 850);
+		frame.getContentPane().setEnabled(false);
+		frame.setBounds(100, 100, 1250, 870);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		entrenadorDAO=new EntrenadorDAO();
@@ -198,6 +229,12 @@ public class App {
 		ejercicios=ejercicioDAO.selectAllEjercicio();
 		
 		
+		JLabel lblClEj = new JLabel("");
+		lblClEj.setFont(new Font("Dialog", Font.BOLD, 17));
+		lblClEj.setForeground(Color.RED);
+		lblClEj.setBounds(593, 460, 410, 38);
+		frame.getContentPane().add(lblClEj);
+		
 		
 		//Columnas de las 3 tablas entrenador, cliente, ejercicios
 		
@@ -208,7 +245,11 @@ public class App {
 				}
 		};
 		modelClienteEjercicio.addColumn("Ejercicios");
-		modelClienteEjercicio.addColumn("Algo");
+		modelClienteEjercicio.addColumn("Peso"); 
+		modelClienteEjercicio.addColumn("Series"); 
+		modelClienteEjercicio.addColumn("Repeticiones"); 
+		modelClienteEjercicio.addColumn("Descanso"); 
+	; 
 		//Entrenador
 		
 		modelEntrenador = new DefaultTableModel() {
@@ -218,6 +259,7 @@ public class App {
 		};
 		modelEntrenador.addColumn("ID");
 		modelEntrenador.addColumn("Nombre");
+		modelEntrenador.addColumn("Clientes");
 		
 		//Cliente
 		modelCliente = new DefaultTableModel(){
@@ -247,6 +289,8 @@ public class App {
      	modelEjercicio.addColumn("Dificultad"); 
      	
      	//Las tres tablas con los scrollpane
+     	
+     	//ClienteEjercicio
      	JTable tableClienteEjercicio = new JTable(modelClienteEjercicio);
      	frame.getContentPane().setLayout(null);
      	tableClienteEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
@@ -263,6 +307,7 @@ public class App {
 				TableModel modelEntrenador= tableEntrenador.getModel();
 				txtIdEntrenador.setText(modelEntrenador.getValueAt(index, 0).toString());
 				txtNombreEntrenador.setText(modelEntrenador.getValueAt(index, 1).toString());
+				txtNumClientes.setText(modelEntrenador.getValueAt(index, 2).toString());
 			}
 		});
 		frame.getContentPane().setLayout(null);
@@ -286,6 +331,10 @@ public class App {
 				txtLesionesCliente.setText(modelCliente.getValueAt(index, 4).toString());
 				txtObjCliente.setText(modelCliente.getValueAt(index, 5).toString());
 				
+				idCliente=Integer.parseInt(txtIdCliente.getText());
+				Cliente cliente=clienteDAO.selectClienteById(idCliente);
+				refrescarClienteEjercicio(cliente);
+				lblClEj.setText("Rutina del Cliente: "+cliente.getNomCliente());
 			}
 		});
 		frame.getContentPane().setLayout(null); 
@@ -314,7 +363,7 @@ public class App {
 		frame.getContentPane().setLayout(null); 
 		tableEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS); 
 		JScrollPane scrollPane_2 = new JScrollPane(tableEjercicio); 
-		scrollPane_2.setBounds(12, 346, 463, 190); 
+		scrollPane_2.setBounds(12, 366, 463, 190); 
 		frame.getContentPane().add(scrollPane_2); 
 		
 		//labels y txt 
@@ -329,27 +378,27 @@ public class App {
 		txtNombreEntrenador.setColumns(10);
 		
 		JLabel lblNombre_1 = new JLabel("Nombre:");
-		lblNombre_1.setBounds(126, 652, 70, 15);
+		lblNombre_1.setBounds(126, 672, 70, 15);
 		frame.getContentPane().add(lblNombre_1);
 		
 		JLabel lblPeso = new JLabel("Peso:");
-		lblPeso.setBounds(126, 679, 70, 15);
+		lblPeso.setBounds(126, 699, 70, 15);
 		frame.getContentPane().add(lblPeso);
 		
 		JLabel lblSeries = new JLabel("Series:");
-		lblSeries.setBounds(126, 708, 70, 15);
+		lblSeries.setBounds(126, 728, 70, 15);
 		frame.getContentPane().add(lblSeries);
 		
 		JLabel lblRepeticiones = new JLabel("Repeticiones:");
-		lblRepeticiones.setBounds(126, 735, 109, 15);
+		lblRepeticiones.setBounds(126, 755, 109, 15);
 		frame.getContentPane().add(lblRepeticiones);
 		
 		JLabel lblDescanso = new JLabel("Descanso:");
-		lblDescanso.setBounds(126, 762, 83, 15);
+		lblDescanso.setBounds(126, 782, 83, 15);
 		frame.getContentPane().add(lblDescanso);
 		
 		JLabel lblDificultad = new JLabel("Dificultad:");
-		lblDificultad.setBounds(126, 791, 83, 15);
+		lblDificultad.setBounds(126, 811, 83, 15);
 		frame.getContentPane().add(lblDificultad);
 		
 		JLabel lblNewLabel = new JLabel("Nombre:");
@@ -358,7 +407,7 @@ public class App {
 		
 		JLabel lblApellidos = new JLabel("Apellidos:");
 		lblApellidos.setBounds(873, 340, 70, 15);
-		frame.getContentPane().add(lblApellidos);
+		frame.getContentPane().add(lblApellidos);	
 		
 		JLabel lblFechaNacimiento = new JLabel("Fecha Nacimiento:");
 		lblFechaNacimiento.setBounds(873, 372, 130, 15);
@@ -373,7 +422,7 @@ public class App {
 		frame.getContentPane().add(lblId);
 		
 		JLabel lblId_1 = new JLabel("id:");
-		lblId_1.setBounds(126, 625, 70, 15);
+		lblId_1.setBounds(126, 645, 70, 15);
 		frame.getContentPane().add(lblId_1);
 
 		JLabel lblId_2 = new JLabel("id:");
@@ -385,32 +434,41 @@ public class App {
 		frame.getContentPane().add(lblObjetivo);
 		
 		txtNombreEjercicio = new JTextField();
-		txtNombreEjercicio.setBounds(232, 650, 114, 19);
+		txtNombreEjercicio.setBounds(232, 670, 114, 19);
 		frame.getContentPane().add(txtNombreEjercicio);
 		txtNombreEjercicio.setColumns(10);
 		
 		txtPesoEjercicio = new JTextField();
-		txtPesoEjercicio.setBounds(232, 677, 114, 19);
+		txtPesoEjercicio.setBounds(232, 697, 114, 19);
 		frame.getContentPane().add(txtPesoEjercicio);
 		txtPesoEjercicio.setColumns(10);
 		
 		txtSeriesEjercicio = new JTextField();
-		txtSeriesEjercicio.setBounds(232, 706, 114, 19);
+		txtSeriesEjercicio.setBounds(232, 726, 114, 19);
 		frame.getContentPane().add(txtSeriesEjercicio);
 		txtSeriesEjercicio.setColumns(10);
 		
 		txtRepsEjercicio = new JTextField();
-		txtRepsEjercicio.setBounds(232, 733, 114, 19);
+		txtRepsEjercicio.setBounds(232, 753, 114, 19);
 		frame.getContentPane().add(txtRepsEjercicio);
 		txtRepsEjercicio.setColumns(10);
 		
 		txtDescansoEjercicio = new JTextField();
-		txtDescansoEjercicio.setBounds(232, 760, 114, 19);
+		txtDescansoEjercicio.setBounds(232, 780, 114, 19);
 		frame.getContentPane().add(txtDescansoEjercicio);
 		txtDescansoEjercicio.setColumns(10);
 		
+
+		txtNumClientes = new JTextField();
+		txtNumClientes.setEditable(false);
+		txtNumClientes.setBounds(159, 344, 171, 19);
+		frame.getContentPane().add(txtNumClientes);
+		txtNumClientes.setColumns(10);
+		
+		
+		
 		txtdificultadEjercicio = new JTextField();
-		txtdificultadEjercicio.setBounds(232, 789, 114, 19);
+		txtdificultadEjercicio.setBounds(232, 809, 114, 19);
 		frame.getContentPane().add(txtdificultadEjercicio);
 		txtdificultadEjercicio.setColumns(10);
 		
@@ -447,7 +505,7 @@ public class App {
 		
 		txtidEjercicio = new JTextField();
 		txtidEjercicio.setEditable(false);
-		txtidEjercicio.setBounds(232, 619, 114, 19);
+		txtidEjercicio.setBounds(232, 639, 114, 19);
 		frame.getContentPane().add(txtidEjercicio);
 		txtidEjercicio.setColumns(10);
 		
@@ -464,7 +522,7 @@ public class App {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				nomEntrenador=txtNombreEntrenador.getText();
-				Entrenador entrenador=new Entrenador(nomEntrenador);				
+				Entrenador entrenador=new Entrenador(nomEntrenador, 0);				
 				entrenadorDAO.insertEntrenador(entrenador);
 				refrescarEntrenador();
 				limpiarEntrenador();
@@ -528,7 +586,7 @@ public class App {
 				
 			}
 		});
-		btnCrearEjercicio.setBounds(22, 548, 157, 25);
+		btnCrearEjercicio.setBounds(22, 568, 157, 25);
 		frame.getContentPane().add(btnCrearEjercicio);
 		
 		JButton btnBorrarEjercicio = new JButton("Borrar Ejercicio");
@@ -542,7 +600,7 @@ public class App {
 				limpiarEjercicio();
 			}
 		});
-		btnBorrarEjercicio.setBounds(304, 548, 171, 25);
+		btnBorrarEjercicio.setBounds(304, 568, 171, 25);
 		frame.getContentPane().add(btnBorrarEjercicio);
 		
 		JButton btnActualizarEjercicio = new JButton("Actualizar Ejercicio");
@@ -572,7 +630,7 @@ public class App {
 				limpiarEjercicio();
 			}
 		});
-		btnActualizarEjercicio.setBounds(146, 585, 200, 25);
+		btnActualizarEjercicio.setBounds(146, 605, 200, 25);
 		frame.getContentPane().add(btnActualizarEjercicio);
 		
 		//cliente
@@ -657,10 +715,12 @@ public class App {
 				Cliente cliente=clienteDAO.selectClienteById(idCliente);
 				Ejercicio ejercicio = ejercicioDAO.selectEjercicioById(idEjercicio);		
 				
-				System.out.println(ejercicio.getIdEjercicio());
+				
 				cliente.anyadirEjercicio(ejercicio);
+				
 				clienteDAO.updateCliente(cliente);
-
+				
+				refrescarClienteEjercicio(cliente);
 			}
 		});
 		btnAsignarRutina.setBounds(650, 706, 157, 25);
@@ -680,13 +740,25 @@ public class App {
 				
 				idCliente=Integer.parseInt(txtIdCliente.getText());
 				idEntrenador=Integer.parseInt(txtIdEntrenador.getText());
+				numClientes=Integer.parseInt(txtNumClientes.getText());
+	
 				
-				Cliente cliente=clienteDAO.selectClienteById(idCliente);				
+				Cliente cliente=clienteDAO.selectClienteById(idCliente);			
 				cliente.setIdEntrenador(idEntrenador);
 				clienteDAO.updateCliente(cliente);
+				
+			
+				Entrenador entrenador=entrenadorDAO.selectEntrenadorById(idEntrenador);	
+				numClientes=numClientes+1;
+				entrenador.setNumClientes(numClientes);
+				entrenadorDAO.updateEntrenador(entrenador);
+				
+				
 				refrescarCliente();
+				refrescarEntrenador();
 				limpiarCliente();
 				limpiarEntrenador();
+				
 			}
 		});
 		btnAsignarEntrenador.setBounds(531, 50, 179, 25);
@@ -709,6 +781,14 @@ public class App {
 		});
 		btnDesasignarCliente.setBounds(531, 87, 179, 25);
 		frame.getContentPane().add(btnDesasignarCliente);
+		
+		JLabel lblNewLabel_1 = new JLabel("Num clientes:");
+		lblNewLabel_1.setBounds(54, 344, 96, 15);
+		frame.getContentPane().add(lblNewLabel_1);
+		
+	
+		
+	
 		
 	
 		/*

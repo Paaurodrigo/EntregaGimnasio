@@ -18,15 +18,19 @@ public class Entrenador {
 	@Column(name = "Nombre")
 	private String nomEntrenador;
 	
+	@Column(name = "NumClientes")
+	private int numClientes;
+	
 	
 
 	public Entrenador() {
 		super();
 	}
 
-	public Entrenador(String nomEntrenador) {
+	public Entrenador(String nomEntrenador, int numClientes) {
 		super();
 		this.nomEntrenador = nomEntrenador;
+		this.numClientes = numClientes;
 	}
 		public int getIdEntrenador() {
 			return idEntrenador;
@@ -42,6 +46,13 @@ public class Entrenador {
 
 		public void setNomEntrenador(String nomEntrenador) {
 			this.nomEntrenador = nomEntrenador;
+		}
+		public int getNumClientes() {
+			return numClientes;
+		}
+
+		public void setNumClientes(int numClientes) {
+			this.idEntrenador = numClientes;
 		}
 	
 	
