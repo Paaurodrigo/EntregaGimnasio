@@ -1,10 +1,8 @@
 package com.hibernate.dao;
 
 import java.util.List;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-
 import com.hibernate.model.Entrenador;
 import com.hibernate.util.HibernateUtil;
 

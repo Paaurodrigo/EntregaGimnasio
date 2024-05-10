@@ -4,12 +4,11 @@
   <artifactId>entregaGym</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <dependencies>
-  	<dependency>
-  		<groupId>net.ejemplo</groupId>
-  		<artifactId>crud-ejemplo</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
-  	</dependency>
-  	
+<dependency>
+    <groupId>org.hibernate.orm</groupId>
+    <artifactId>hibernate-core</artifactId>
+    <version>6.5.0.Final</version>
+</dependency>
   	 <!-- https://mvnrepository.com/artifact/com.mysql/mysql-connector-j -->
 <dependency>
     <groupId>com.mysql</groupId>

@@ -24,6 +24,8 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Color;
 import javax.swing.SwingConstants;
 import javax.swing.JPanel;
@@ -209,9 +211,10 @@ public class App {
 			private JTable table;
 			private JTextField txtNumClientes;
 			int numClientes;
+			int comprobacion=0;
+			String idEjLista;
+			int idEjListaInt;
 			
-			
-	
 	private void initialize() {
 		
 		frame = new JFrame();
@@ -708,25 +711,55 @@ public class App {
 		btnAsignarRutina.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e2) {
-		
+				comprobacion=0;
 				idCliente=Integer.parseInt(txtIdCliente.getText());
 				idEjercicio=Integer.parseInt(txtidEjercicio.getText());
 				
 				Cliente cliente=clienteDAO.selectClienteById(idCliente);
 				Ejercicio ejercicio = ejercicioDAO.selectEjercicioById(idEjercicio);		
+		
+				cliente.getEjercicios();
+				// Suponiendo que cliente.getEjercicios() devuelve una lista
+				List<Ejercicio> ejercicios = cliente.getEjercicios();
+
+				for (Ejercicio ejercicioLista : ejercicios) {
+			
+				 if (ejercicioLista.getNomEjercicio().equals(ejercicio.getNomEjercicio())) {
+				     comprobacion++;
+				 }
+				}
+				if (comprobacion==0) {
+					 cliente.anyadirEjercicio(ejercicio);
+						
+						clienteDAO.updateCliente(cliente);
+						
+						refrescarClienteEjercicio(cliente);
+				}else {
+					JOptionPane.showMessageDialog(null, "Este ejercicio ya esta en la rutina del usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+				}
 				
+
+			}
+		});
+		btnAsignarRutina.setBounds(650, 706, 157, 25);
+		frame.getContentPane().add(btnAsignarRutina);
+	// ME quedo por aqui  falta eliminar el ejercicio de la lista	
+		JButton btnEliminarRutina = new JButton("Eliminar Ejercicio");
+		btnEliminarRutina.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				cliente.getEjercicios();
+				idEjLista=txtidEjercicio.getText();
+			 idEjListaInt=Integer.parseInt(idEjLista);
+			 
+			 Ejercicio ejercicioL = ejercicioDAO.selectEjercicioById(idEjListaInt);		
 				
-				cliente.anyadirEjercicio(ejercicio);
-				
+				cliente.getEjercicios().removeIf(ejercicio -> ejercicioL.getIdEjercicio() == idEjListaInt);
 				clienteDAO.updateCliente(cliente);
 				
 				refrescarClienteEjercicio(cliente);
 			}
 		});
-		btnAsignarRutina.setBounds(650, 706, 157, 25);
-		frame.getContentPane().add(btnAsignarRutina);
-		
-		JButton btnEliminarRutina = new JButton("Eliminar Ejercicio");
 		btnEliminarRutina.setBounds(962, 706, 157, 25);
 		frame.getContentPane().add(btnEliminarRutina);
 		
