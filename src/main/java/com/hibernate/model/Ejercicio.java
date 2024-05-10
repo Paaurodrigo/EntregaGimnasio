@@ -1,5 +1,6 @@
 package com.hibernate.model;
 
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,9 @@ public class Ejercicio {
 	@Column(name = "Dificultad")
 	private String dificultad;
 	
+	@Column(name = "Foto Ejercicio")
+	private Blob fotoEjercicio;
+	
 	
 	@ManyToMany  (fetch=FetchType.EAGER) 
 	@JoinTable(
@@ -54,7 +58,7 @@ public class Ejercicio {
 		super();
 	}
 	
-	public Ejercicio(String nomEjercicio, double peso,int series,int reps,String descanso,String dificultad) {
+	public Ejercicio(String nomEjercicio, double peso,int series,int reps,String descanso,String dificultad, Blob fotoEjercicio) {
 		super();
 		this.nomEjercicio = nomEjercicio;
 		this.peso = peso;
@@ -62,6 +66,7 @@ public class Ejercicio {
 		this.reps = reps;
 		this.descanso=descanso;
 		this.dificultad = dificultad;
+		this.fotoEjercicio=fotoEjercicio;
 	}
 
 	public int getIdEjercicio() {
@@ -110,6 +115,14 @@ public class Ejercicio {
 
 	public void setDescanso(String descanso) {
 		this.descanso = descanso;
+	}
+	
+	public Blob getFotoEjercicio() {
+		return fotoEjercicio;
+	}
+
+	public void setFotoEjercicio(Blob fotoEjercicio) {
+		this.fotoEjercicio = fotoEjercicio;
 	}
 
 	public String getDificultad() {

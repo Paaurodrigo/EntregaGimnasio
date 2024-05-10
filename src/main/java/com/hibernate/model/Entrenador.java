@@ -52,7 +52,7 @@ public class Entrenador {
 		}
 
 		public void setNumClientes(int numClientes) {
-			this.idEntrenador = numClientes;
+			this.numClientes = numClientes;
 		}
 	
 	
