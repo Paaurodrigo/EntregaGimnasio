@@ -3,8 +3,13 @@ package com.hibernate;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Blob;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -22,6 +27,7 @@ import com.hibernate.model.Ejercicio;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.JSeparator;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 
@@ -35,6 +41,7 @@ import javax.swing.SwingConstants;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import java.awt.Font;
+import java.awt.Image;
 
 public class App {
 
@@ -71,6 +78,7 @@ public class App {
 	private JTextField txtidEjercicio;
 	private JTextField txtIdCliente;
 	private Blob img;
+	private JLabel lblFotoEj;
 
 	/**
 	 * Launch the application.
@@ -179,7 +187,18 @@ public class App {
 		txtRepsEjercicio.setText("");
 		txtDescansoEjercicio.setText("");
 		txtdificultadEjercicio.setText("");
+		txtFoto.setText("");
 	}
+	
+	 boolean comprobarExpReg(String nombre, String er) {
+			Pattern pat = Pattern.compile(er);
+			Matcher mat = pat.matcher(nombre);
+			if (mat.matches()) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 	/**
 	 * Create the application.
@@ -192,21 +211,21 @@ public class App {
 	 * Initialize the contents of the frame.
 	 */
 	// variables
-	String nomEntrenador;
+	String nomEntrenador="";
 	int idEntrenador;
 	int idEjercicio;
 	int idCliente;
-	String nomEjercicio;
-	double pesoEjercicio;
-	int seriesEjercicio;
-	int repsEjercicio;
-	String descansoEjercicio;
-	String dificultadEjercicio;
-	String nomCliente;
-	String apsCliente;
-	String fecaNacCliente;
-	String lesionesCliente;
-	String objCliente;
+	String nomEjercicio="";
+	double pesoEjercicio=0;
+	int seriesEjercicio=0;
+	int repsEjercicio=0;
+	String descansoEjercicio="";
+	String dificultadEjercicio="";
+	String nomCliente="";
+	String apsCliente="";
+	String fecaNacCliente="";
+	String lesionesCliente="";
+	String objCliente="";
 	private JTable table;
 	private JTextField txtNumClientes;
 	int numClientes;
@@ -230,11 +249,15 @@ public class App {
 
 		ejercicioDAO = new EjercicioDAO();
 		ejercicios = ejercicioDAO.selectAllEjercicio();
-
+		
+		 lblFotoEj = new JLabel("");
+		lblFotoEj.setBounds(510, 366, 200, 190);
+		frame.getContentPane().add(lblFotoEj);
+		
 		JLabel lblClEj = new JLabel("");
 		lblClEj.setFont(new Font("Dialog", Font.BOLD, 17));
 		lblClEj.setForeground(Color.RED);
-		lblClEj.setBounds(670, 446, 410, 38);
+		lblClEj.setBounds(772, 394, 410, 38);
 		frame.getContentPane().add(lblClEj);
 
 		// Columnas de las 3 tablas entrenador, cliente, ejercicios
@@ -257,6 +280,8 @@ public class App {
 		modelEntrenador = new DefaultTableModel() {
 			public boolean isCellEditable(int row, int colum) {
 				return false;
+		
+				
 			}
 		};
 		modelEntrenador.addColumn("ID");
@@ -276,6 +301,7 @@ public class App {
 		modelCliente.addColumn("Lesiones");
 		modelCliente.addColumn("Objetivo");
 		modelCliente.addColumn("idEntrenador");
+		
 		// Ejercicio
 		modelEjercicio = new DefaultTableModel() {
 			public boolean isCellEditable(int row, int colum) {
@@ -297,8 +323,9 @@ public class App {
 		frame.getContentPane().setLayout(null);
 		tableClienteEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		JScrollPane scrollPane3 = new JScrollPane(tableClienteEjercicio);
-		scrollPane3.setBounds(670, 488, 550, 196);
+		scrollPane3.setBounds(772, 440, 440, 196);
 		frame.getContentPane().add(scrollPane3);
+
 
 		// Tabla entrenador
 		JTable tableEntrenador = new JTable(modelEntrenador);
@@ -349,6 +376,7 @@ public class App {
 
 		// Tabla ejercicio
 		JTable tableEjercicio = new JTable(modelEjercicio);
+		tableEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		tableEjercicio.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -361,11 +389,35 @@ public class App {
 				txtRepsEjercicio.setText(modelEjercicio.getValueAt(index, 4).toString());
 				txtDescansoEjercicio.setText(modelEjercicio.getValueAt(index, 5).toString());
 				txtdificultadEjercicio.setText(modelEjercicio.getValueAt(index, 6).toString());
+				int idEjercicio=(int)modelEjercicio.getValueAt(index, 0);
+				Ejercicio ejercicio=ejercicioDAO.selectEjercicioById(idEjercicio);
+				
+				try {
 
+					img = ejercicio.getFotoEjercicio();
+
+					byte[] fotoByte = img.getBytes(1, (int) img.length());
+
+					ImageIcon imageIcon = new ImageIcon(fotoByte);
+
+					Image image = imageIcon.getImage();
+
+					image.getScaledInstance(300, 300, Image.SCALE_SMOOTH);
+
+					ImageIcon resizedImage = new ImageIcon(image);
+
+					lblFotoEj.setIcon(resizedImage);
+
+					lblFotoEj.revalidate();
+
+				} catch (Exception imgException) {
+
+
+
+				}
 			}
 		});
 		frame.getContentPane().setLayout(null);
-		tableEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		JScrollPane scrollPane_2 = new JScrollPane(tableEjercicio);
 		scrollPane_2.setBounds(12, 366, 463, 190);
 		frame.getContentPane().add(scrollPane_2);
@@ -462,6 +514,12 @@ public class App {
 		frame.getContentPane().add(txtDescansoEjercicio);
 		txtDescansoEjercicio.setColumns(10);
 
+		txtFoto = new JTextField();
+		txtFoto.setEditable(false);
+		txtFoto.setBounds(247, 766, 114, 19);
+		frame.getContentPane().add(txtFoto);
+		txtFoto.setColumns(10);
+		
 		txtNumClientes = new JTextField();
 		txtNumClientes.setEditable(false);
 		txtNumClientes.setBounds(159, 344, 171, 19);
@@ -522,11 +580,20 @@ public class App {
 		btnCrearEntrenador.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
 				nomEntrenador = txtNombreEntrenador.getText();
+				
+				if (!comprobarExpReg(nomEntrenador, ".*[a-zA-Z].*")) {
+		            JOptionPane.showMessageDialog(null, "Has introducido mal el nombre, intentalo de nuevo", "Nombre mal introducido", JOptionPane.WARNING_MESSAGE);
+
+		 }else {
+				
 				Entrenador entrenador = new Entrenador(nomEntrenador, 0);
 				entrenadorDAO.insertEntrenador(entrenador);
 				refrescarEntrenador();
 				limpiarEntrenador();
+				JOptionPane.showMessageDialog(frame,"Entrenador creado");
+			}
 			}
 		});
 		btnCrearEntrenador.setBounds(12, 214, 157, 25);
@@ -541,6 +608,7 @@ public class App {
 				entrenadorDAO.deleteEntrenador(idEntrenador);
 				refrescarEntrenador();
 				limpiarEntrenador();
+				JOptionPane.showMessageDialog(frame,"Entrenador borrado");
 			}
 		});
 		btnBorrarEntrenador.setBounds(322, 214, 171, 25);
@@ -552,7 +620,10 @@ public class App {
 			public void mouseClicked(MouseEvent e) {
 				idEntrenador = Integer.parseInt(txtIdEntrenador.getText());
 				nomEntrenador = txtNombreEntrenador.getText();
+				if (!comprobarExpReg(nomEntrenador, ".*[a-zA-Z].*")) {
+		            JOptionPane.showMessageDialog(null, "Has introducido mal el nombre, minimo debe tener una letra", "Nombre mal introducido", JOptionPane.WARNING_MESSAGE);
 
+		 }else {
 				Entrenador entrenador2 = entrenadorDAO.selectEntrenadorById(idEntrenador);
 				entrenador2.setNomEntrenador(nomEntrenador);
 
@@ -560,6 +631,8 @@ public class App {
 
 				refrescarEntrenador();
 				limpiarEntrenador();
+				JOptionPane.showMessageDialog(frame,"Entrenador actualizado");
+		 }
 			}
 		});
 		btnActualizarEntrenador.setBounds(146, 251, 200, 25);
@@ -571,23 +644,36 @@ public class App {
 		btnCrearEjercicio.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-
+nomEjercicio="";
 				nomEjercicio = txtNombreEjercicio.getText();
 				pesoEjercicio = Double.parseDouble(txtPesoEjercicio.getText());
 				seriesEjercicio = Integer.parseInt(txtSeriesEjercicio.getText());
 				repsEjercicio = Integer.parseInt(txtRepsEjercicio.getText());
 				descansoEjercicio = txtDescansoEjercicio.getText();
 				dificultadEjercicio = txtdificultadEjercicio.getText();
+				String textFoto= txtFoto.getText();
+				byte[] fotoB; 
+		
+				try {
 
+					fotoB = Files.readAllBytes(Paths.get(textFoto));
+
+					img = new com.mysql.cj.jdbc.Blob(fotoB, null);
+
+				} catch (IOException e3) {
+
+				}
+				
 				Ejercicio ejercicio = new Ejercicio(nomEjercicio, pesoEjercicio, seriesEjercicio, repsEjercicio,
 				descansoEjercicio, dificultadEjercicio,img);
 				ejercicioDAO.insertEjercicio(ejercicio);
 				refrescarEjercicio();
 				limpiarEjercicio();
-
+				JOptionPane.showMessageDialog(frame,"Ejercicio creado");
+				
 			}
 		});
-		btnCrearEjercicio.setBounds(22, 568, 157, 25);
+		btnCrearEjercicio.setBounds(12, 568, 157, 25);
 		frame.getContentPane().add(btnCrearEjercicio);
 
 		JButton btnBorrarEjercicio = new JButton("Borrar Ejercicio");
@@ -617,7 +703,17 @@ public class App {
 				repsEjercicio = Integer.parseInt(txtRepsEjercicio.getText());
 				descansoEjercicio = txtDescansoEjercicio.getText();
 				dificultadEjercicio = txtdificultadEjercicio.getText();
+				String textFoto= txtFoto.getText();
+				byte[] fotoB; 
+				try {
 
+					fotoB = Files.readAllBytes(Paths.get(textFoto));
+
+					img = new com.mysql.cj.jdbc.Blob(fotoB, null);
+
+				} catch (IOException e3) {
+
+				}
 				Ejercicio ejercicio2 = ejercicioDAO.selectEjercicioById(idEjercicio);
 				ejercicio2.setNomEjercicio(nomEjercicio);
 				ejercicio2.setPeso(pesoEjercicio);
@@ -625,7 +721,7 @@ public class App {
 				ejercicio2.setReps(repsEjercicio);
 				ejercicio2.setDescanso(descansoEjercicio);
 				ejercicio2.setDificultad(dificultadEjercicio);
-
+				ejercicio2.setFotoEjercicio(img);
 				ejercicioDAO.updateEjercicio(ejercicio2);
 
 				refrescarEjercicio();
@@ -737,7 +833,7 @@ public class App {
 
 			}
 		});
-		btnAsignarRutina.setBounds(727, 696, 157, 25);
+		btnAsignarRutina.setBounds(772, 644, 157, 25);
 		frame.getContentPane().add(btnAsignarRutina);
 		// ME quedo por aqui falta eliminar el ejercicio de la lista
 		JButton btnEliminarRutina = new JButton("Eliminar Ejercicio");
@@ -758,7 +854,7 @@ public class App {
 				refrescarClienteEjercicio(cliente);
 			}
 		});
-		btnEliminarRutina.setBounds(1039, 696, 157, 25);
+		btnEliminarRutina.setBounds(1055, 648, 157, 25);
 		frame.getContentPane().add(btnEliminarRutina);
 
 		JButton btnAsignarEntrenador = new JButton("Asignar Cliente");
@@ -831,8 +927,8 @@ public class App {
 		JLabel lblNewLabel_1 = new JLabel("Num clientes:");
 		lblNewLabel_1.setBounds(54, 344, 96, 15);
 		frame.getContentPane().add(lblNewLabel_1);
-	/*	
-		JButton btnFoto = new JButton("Foto");
+		
+		JButton btnFoto = new JButton("Seleccionar Foto");
 		btnFoto.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -843,7 +939,7 @@ public class App {
 
 				if (chooser.getSelectedFile() != null) {
 
-					File f = chooser.getSelectedFile();
+					java.io.File f = chooser.getSelectedFile();
 
 					String fileName = f.getAbsolutePath();
 
@@ -852,40 +948,47 @@ public class App {
 				}
 			}
 		});
-		btnFoto.setBounds(54, 763, 117, 25);
+		
+		
+		
+		
+		btnFoto.setBounds(54, 763, 175, 25);
 		frame.getContentPane().add(btnFoto);
 		
-		txtFoto = new JTextField();
-		txtFoto.setBounds(200, 766, 114, 19);
-		frame.getContentPane().add(txtFoto);
-		txtFoto.setColumns(10);
-*/
+		
+		
+		
+
 		/*
 		 * //Decoradores JSeparator separator = new JSeparator();
 		 * separator.setBackground(new Color(0, 0, 0)); separator.setBounds(0, 332, 556,
 		 * 2); frame.getContentPane().add(separator);
+		 * 
 		 * 
 		 * JSeparator separator_1 = new JSeparator(); separator_1.setBackground(new
 		 * Color(0, 0, 0)); separator_1.setOrientation(SwingConstants.VERTICAL);
 		 * separator_1.setBounds(555, 0, 2, 820);
 		 * frame.getContentPane().add(separator_1);
 		 * 
+		 * 
 		 * JPanel panel = new JPanel();
 		 * panel.setBackground(UIManager.getColor("Button.darkShadow"));
 		 * panel.setBounds(0, 0, 556, 334); frame.getContentPane().add(panel);
+		 * 
 		 * 
 		 * JPanel panel_1 = new JPanel();
 		 * panel_1.setBackground(UIManager.getColor("Button.focus"));
 		 * panel_1.setBounds(0, 332, 556, 488); frame.getContentPane().add(panel_1);
 		 * 
+		 * 
 		 * JSeparator separator_2 = new JSeparator(); separator_2.setBackground(new
 		 * Color(0, 0, 0)); separator_2.setBounds(567, 474, 683, 2);
 		 * frame.getContentPane().add(separator_2);
 		 * 
+		 * 
 		 * JPanel panel_2 = new JPanel();
 		 * panel_2.setBackground(UIManager.getColor("Button.shadow"));
 		 * panel_2.setBounds(555, 0, 685, 476); frame.getContentPane().add(panel_2);
-		 * 
 		 */
 
 		// Mostrar las tres tablas
