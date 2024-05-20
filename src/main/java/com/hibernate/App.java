@@ -14,6 +14,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import com.hibernate.dao.EntrenadorDAO;
@@ -42,7 +43,6 @@ import java.awt.Image;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
-
 
 public class App {
 
@@ -80,9 +80,13 @@ public class App {
 	private Blob img;
 	private JLabel lblFotoEj;
 	private JComboBox comboBoxDif;
-
-	//Aplicacion
+	JTable tableClienteEjercicio;
+	JTable tableEntrenador;
+	JTable tableCliente;
+	JTable tableEjercicio;
 	
+	// Aplicacion
+
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -95,7 +99,7 @@ public class App {
 			}
 		});
 	}
-	
+
 //Funciones
 	public void refrescarEntrenador() {
 		List<Entrenador> entrenadores = null;
@@ -200,12 +204,26 @@ public class App {
 			return false;
 		}
 	}
+	
+	private void centrartabla (JTable table) {
+	DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+	centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+	
+	for (int i = 0; i < table.getColumnCount(); i++) {
+		
+		table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
 
+	}
+}
 	/**
 	 * Create the application.
 	 */
 	public App() {
 		initialize();
+		centrartabla(tableClienteEjercicio);
+		centrartabla(tableCliente);
+		centrartabla(tableEjercicio);
+		centrartabla(tableEntrenador);
 	}
 
 	/**
@@ -258,7 +276,7 @@ public class App {
 		JLabel lblClEj = new JLabel("");
 		lblClEj.setFont(new Font("Liberation Mono", Font.BOLD, 20));
 		lblClEj.setForeground(Color.DARK_GRAY);
-		lblClEj.setBounds(957, 438, 238, 38);
+		lblClEj.setBounds(1005, 438, 238, 38);
 		frame.getContentPane().add(lblClEj);
 
 		// Columnas de las 3 tablas entrenador, cliente, ejercicios
@@ -319,7 +337,7 @@ public class App {
 		// Las tres tablas con los scrollpane
 
 		// ClienteEjercicio
-		JTable tableClienteEjercicio = new JTable(modelClienteEjercicio);
+		tableClienteEjercicio = new JTable(modelClienteEjercicio);
 		frame.getContentPane().setLayout(null);
 		tableClienteEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		JScrollPane scrollPane3 = new JScrollPane(tableClienteEjercicio);
@@ -327,7 +345,7 @@ public class App {
 		frame.getContentPane().add(scrollPane3);
 
 		// Tabla entrenador
-		JTable tableEntrenador = new JTable(modelEntrenador);
+		tableEntrenador = new JTable(modelEntrenador);
 		tableEntrenador.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -345,7 +363,7 @@ public class App {
 		frame.getContentPane().add(scrollPane);
 
 		// Tabla cliente
-		JTable tableCliente = new JTable(modelCliente);
+		tableCliente = new JTable(modelCliente);
 		tableCliente.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -358,7 +376,7 @@ public class App {
 				txtFechaNacCliente.setText(modelCliente.getValueAt(index, 3).toString());
 				txtLesionesCliente.setText(modelCliente.getValueAt(index, 4).toString());
 				txtObjCliente.setText(modelCliente.getValueAt(index, 5).toString());
-				
+
 				idCliente = Integer.parseInt(txtIdCliente.getText());
 				Cliente cliente = clienteDAO.selectClienteById(idCliente);
 				refrescarClienteEjercicio(cliente);
@@ -373,7 +391,7 @@ public class App {
 		frame.getContentPane().add(scrollPane_1);
 
 		// Tabla ejercicio
-		JTable tableEjercicio = new JTable(modelEjercicio);
+		tableEjercicio = new JTable(modelEjercicio);
 		tableEjercicio.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		tableEjercicio.addMouseListener(new MouseAdapter() {
 			@Override
@@ -389,7 +407,7 @@ public class App {
 				comboBoxDif.setSelectedItem(modelEjercicio.getValueAt(index, 6).toString());
 				int idEjercicio = (int) modelEjercicio.getValueAt(index, 0);
 				Ejercicio ejercicio = ejercicioDAO.selectEjercicioById(idEjercicio);
-
+// se selecciona la imagen y la muestra por pantalla
 				try {
 					img = ejercicio.getFotoEjercicio();
 					byte[] fotoByte = img.getBytes(1, (int) img.length());
@@ -480,15 +498,19 @@ public class App {
 		lblApellidos.setBounds(780, 381, 70, 15);
 		frame.getContentPane().add(lblApellidos);
 
+		JLabel lblSegundos = new JLabel("segundos");
+		lblSegundos.setBounds(465, 762, 70, 15);
+		frame.getContentPane().add(lblSegundos);
+		
 		JLabel lblFechaNacimiento = new JLabel("Fecha Nacimiento:");
 		lblFechaNacimiento.setBounds(994, 325, 130, 15);
 		frame.getContentPane().add(lblFechaNacimiento);
 
-		 comboBoxDif = new JComboBox();
-		comboBoxDif.setModel(new DefaultComboBoxModel(new String[] {"Facil", "Intermedia", "Dificil"}));
+		comboBoxDif = new JComboBox();
+		comboBoxDif.setModel(new DefaultComboBoxModel(new String[] { "Facil", "Intermedia", "Dificil" }));
 		comboBoxDif.setBounds(346, 784, 107, 24);
 		frame.getContentPane().add(comboBoxDif);
-		
+
 		lblLesiones = new JLabel("Lesiones:");
 		lblLesiones.setBounds(1054, 352, 70, 15);
 		frame.getContentPane().add(lblLesiones);
@@ -515,28 +537,32 @@ public class App {
 		txtNombreEjercicio.setColumns(10);
 
 		txtPesoEjercicio = new JTextField();
+		txtPesoEjercicio.setToolTipText("0.0-100.0");
 		txtPesoEjercicio.setBounds(100, 760, 114, 19);
 		frame.getContentPane().add(txtPesoEjercicio);
 		txtPesoEjercicio.setColumns(10);
 
 		txtSeriesEjercicio = new JTextField();
+		txtSeriesEjercicio.setToolTipText("0-50");
 		txtSeriesEjercicio.setBounds(100, 787, 114, 19);
 		frame.getContentPane().add(txtSeriesEjercicio);
 		txtSeriesEjercicio.setColumns(10);
 
 		txtRepsEjercicio = new JTextField();
+		txtRepsEjercicio.setToolTipText("0-50");
 		txtRepsEjercicio.setBounds(346, 733, 114, 19);
 		frame.getContentPane().add(txtRepsEjercicio);
 		txtRepsEjercicio.setColumns(10);
 
 		txtDescansoEjercicio = new JTextField();
+		txtDescansoEjercicio.setToolTipText("0-999");
 		txtDescansoEjercicio.setBounds(346, 762, 114, 19);
 		frame.getContentPane().add(txtDescansoEjercicio);
 		txtDescansoEjercicio.setColumns(10);
 
 		txtFoto = new JTextField();
 		txtFoto.setEditable(false);
-		txtFoto.setBounds(660, 760, 75, 19);
+		txtFoto.setBounds(663, 787, 75, 19);
 		frame.getContentPane().add(txtFoto);
 		txtFoto.setColumns(10);
 
@@ -557,11 +583,13 @@ public class App {
 		txtApellidosCliente.setColumns(10);
 
 		txtFechaNacCliente = new JTextField();
+		txtFechaNacCliente.setToolTipText("DD/MM/AAAA");
 		txtFechaNacCliente.setBounds(1137, 323, 114, 19);
 		frame.getContentPane().add(txtFechaNacCliente);
 		txtFechaNacCliente.setColumns(10);
 
 		txtLesionesCliente = new JTextField();
+		txtLesionesCliente.setToolTipText("Si/No");
 		txtLesionesCliente.setBounds(1137, 350, 114, 19);
 		frame.getContentPane().add(txtLesionesCliente);
 		txtLesionesCliente.setColumns(10);
@@ -617,11 +645,21 @@ public class App {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
+				//control de errores
+				
 				if (txtIdEntrenador.getText() == null || txtIdEntrenador.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "No has seleccionado ningun entrenador", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
-					numClientes = Integer.parseInt(txtNumClientes.getText());
+
+				} else if (Integer.parseInt(txtIdEntrenador.getText()) == 100000) { // si el id del entrenador es este significa que es la clave
+																					// que he utilizado para decir que un cliente no tiene entrenador
+																					// no se puede borrar ni actualizar
+
+					JOptionPane.showMessageDialog(null, "Este entrenador no es un entrenador", "No se puede borrar",
+							JOptionPane.ERROR_MESSAGE);
+
 				} else if (Integer.parseInt(txtNumClientes.getText()) > 0) {
+					numClientes = Integer.parseInt(txtNumClientes.getText());
 					JOptionPane.showMessageDialog(null, "Este entrenador tiene asigandos clientes",
 							"No se puede borrar", JOptionPane.ERROR_MESSAGE);
 				} else {
@@ -640,12 +678,20 @@ public class App {
 		btnActualizarEntrenador.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				//control de errores
+				
 				if (txtIdEntrenador.getText() == null || txtIdEntrenador.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "No has seleccionado ningun entrenador", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtNombreEntrenador.getText() == null || txtNombreEntrenador.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Debes poner el nombre del entrenador", "ERROR",
+							JOptionPane.ERROR_MESSAGE);
+
+				} else if (Integer.parseInt(txtIdEntrenador.getText()) == 100000) {
+
+					JOptionPane.showMessageDialog(null, "Este entrenador no es un entrenador", "No se puede editar",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else {
@@ -674,6 +720,9 @@ public class App {
 		btnCrearEjercicio.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				//control de errores
+				
 				if (txtNombreEjercicio.getText() == null || txtNombreEjercicio.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Falta el nombre del ejercicio", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
@@ -683,7 +732,7 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtPesoEjercicio.getText(), "^(?:100(?:\\.0)?|\\d{1,2}(?:\\.\\d)?)$")) {
-					JOptionPane.showMessageDialog(null, "Debe ser un numero del 0.0 al 100.0", "ERROR",
+					JOptionPane.showMessageDialog(null, "El peso debe ser un numero del 0.0 al 100.0", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtSeriesEjercicio.getText() == null || txtSeriesEjercicio.getText().isEmpty()) {
@@ -691,7 +740,7 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtSeriesEjercicio.getText(), "^(?:50|[0-4]?\\d)$")) {
-					JOptionPane.showMessageDialog(null, "Debe ser un numero del 0 al 50", "ERROR",
+					JOptionPane.showMessageDialog(null, "Las series deben ser un numero del 0 al 50", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtRepsEjercicio.getText() == null || txtRepsEjercicio.getText().isEmpty()) {
@@ -699,7 +748,7 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtRepsEjercicio.getText(), "^(?:50|[0-4]?\\d)$")) {
-					JOptionPane.showMessageDialog(null, "Debe ser un numero del 0 al 50", "ERROR",
+					JOptionPane.showMessageDialog(null, "Las repeticiones deben ser un numero del 0 al 50", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtDescansoEjercicio.getText() == null || txtDescansoEjercicio.getText().isEmpty()) {
@@ -707,10 +756,9 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtDescansoEjercicio.getText(), "^[0-9]{1,3}$")) {
-					JOptionPane.showMessageDialog(null, "Debes poner minimo 1 cifra y maximo 3 cifras", "ERROR",
-							JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "En el descanso debes poner minimo 1 cifra y maximo 3 cifras",
+							"ERROR", JOptionPane.ERROR_MESSAGE);
 
-				
 				} else if (txtFoto.getText() == null || txtFoto.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Falta la foto del ejercicio", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
@@ -725,7 +773,7 @@ public class App {
 					dificultadEjercicio = comboBoxDif.getSelectedItem().toString();
 					String textFoto = txtFoto.getText();
 					byte[] fotoB;
-
+// escoger la foto
 					try {
 
 						fotoB = Files.readAllBytes(Paths.get(textFoto));
@@ -793,7 +841,7 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtPesoEjercicio.getText(), "^(?:100(?:\\.0)?|\\d{1,2}(?:\\.\\d)?)$")) {
-					JOptionPane.showMessageDialog(null, "Debe ser un numero del 0.0 al 100.0", "ERROR",
+					JOptionPane.showMessageDialog(null, "El peso debe ser un numero del 0.0 al 100.0", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtSeriesEjercicio.getText() == null || txtSeriesEjercicio.getText().isEmpty()) {
@@ -801,7 +849,7 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtSeriesEjercicio.getText(), "^(?:50|[0-4]?\\d)$")) {
-					JOptionPane.showMessageDialog(null, "Debe ser un numero del 0 al 50", "ERROR",
+					JOptionPane.showMessageDialog(null, "Las series deben ser un numero del 0 al 50", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtRepsEjercicio.getText() == null || txtRepsEjercicio.getText().isEmpty()) {
@@ -809,7 +857,7 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtRepsEjercicio.getText(), "^(?:50|[0-4]?\\d)$")) {
-					JOptionPane.showMessageDialog(null, "Debe ser un numero del 0 al 50", "ERROR",
+					JOptionPane.showMessageDialog(null, "Las repeticiones deben ser un numero del 0 al 50", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (txtDescansoEjercicio.getText() == null || txtDescansoEjercicio.getText().isEmpty()) {
@@ -817,10 +865,8 @@ public class App {
 							JOptionPane.ERROR_MESSAGE);
 
 				} else if (!comprobarExpReg(txtDescansoEjercicio.getText(), "^[0-9]{1,3}$")) {
-					JOptionPane.showMessageDialog(null, "En el descanso debes poner minimo 1 cifra y masximo 3 cifras", "ERROR",
-							JOptionPane.ERROR_MESSAGE);
-
-											
+					JOptionPane.showMessageDialog(null, "En el descanso debes poner minimo 1 cifra y masximo 3 cifras",
+							"ERROR", JOptionPane.ERROR_MESSAGE);
 
 				} else {
 
@@ -874,6 +920,9 @@ public class App {
 		btnCrearCliente.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				//control de errores
+				
 				if (txtNombreCliente.getText() == null || txtNombreCliente.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Falta el nombre del cliente", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
@@ -943,6 +992,9 @@ public class App {
 		btnActualizarCliente.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				
+				//control de errores
+				
 				if (txtNombreCliente.getText() == null || txtNombreCliente.getText().isEmpty()) {
 					JOptionPane.showMessageDialog(null, "Falta el nombre del cliente", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
@@ -1048,7 +1100,7 @@ public class App {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				int index = tableClienteEjercicio.getSelectedRow();
-				if (index == -1) {
+				if (index == -1) {// comprobar si ha selelcionado un ejercicio de la tabla
 					JOptionPane.showMessageDialog(null, "No has seleccionado ningun ejercicio de la rutina", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 				} else {
@@ -1057,10 +1109,10 @@ public class App {
 
 					Cliente cliente = clienteDAO.selectClienteById(Integer.parseInt(txtIdCliente.getText()));
 					Ejercicio ejercicio = ejercicioDAO.selectEjercicioById(idEjercicioE);
-
-					cliente.getEjercicios()
-							.removeIf(c -> String.valueOf(c.getIdEjercicio()).equals(String.valueOf(idEjercicioE)));
-					List<Ejercicio> clientesEjer = null;
+					
+					cliente.quitarEjercicio(ejercicio);
+					
+				
 
 					clienteDAO.updateCliente(cliente);
 					refrescarClienteEjercicio(cliente);
@@ -1074,33 +1126,46 @@ public class App {
 		btnAsignarEntrenador.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				if (txtIdCliente.getText() == null || txtIdCliente.getText().isEmpty()) {
 
-				idCliente = Integer.parseInt(txtIdCliente.getText());
-				idEntrenador = Integer.parseInt(txtIdEntrenador.getText());
-				Cliente cl = clienteDAO.selectClienteById(idCliente);
+					JOptionPane.showMessageDialog(null, "Selecciona un cliente de la tabla clientes", "ERROR",
+							JOptionPane.ERROR_MESSAGE);
 
-				if (cl.getIdEntrenador() != 100000) {
+				} else if (txtIdEntrenador.getText() == null || txtIdEntrenador.getText().isEmpty()) {
 
-					JOptionPane.showMessageDialog(null, "Este cliente ya tiene asigando un entrenador", "ERROR",
+					JOptionPane.showMessageDialog(null, "Selecciona un entrenador de la tabla entrenadores", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else {
-					Cliente cliente = clienteDAO.selectClienteById(idCliente);
-					cliente.setIdEntrenador(idEntrenador);
-					clienteDAO.updateCliente(cliente);
 
-					Entrenador entrenador = entrenadorDAO.selectEntrenadorById(idEntrenador);
+					idCliente = Integer.parseInt(txtIdCliente.getText());
+					idEntrenador = Integer.parseInt(txtIdEntrenador.getText());
+					Cliente cl = clienteDAO.selectClienteById(idCliente);
 
-					numClientes = entrenador.getNumClientes();
-					numClientes++;
+					if (cl.getIdEntrenador() != 100000) {
 
-					entrenador.setNumClientes(numClientes);
-					entrenadorDAO.updateEntrenador(entrenador);
+						JOptionPane.showMessageDialog(null, "Este cliente ya tiene asigando un entrenador", "ERROR",
+								JOptionPane.ERROR_MESSAGE);
 
-					refrescarCliente();
-					refrescarEntrenador();
-					limpiarCliente();
-					limpiarEntrenador();
+					} else {
+						Cliente cliente = clienteDAO.selectClienteById(idCliente);
+						cliente.setIdEntrenador(idEntrenador);
+						clienteDAO.updateCliente(cliente);
+
+						Entrenador entrenador = entrenadorDAO.selectEntrenadorById(idEntrenador);
+
+						numClientes = entrenador.getNumClientes();
+						numClientes++;
+
+						entrenador.setNumClientes(numClientes);
+						entrenadorDAO.updateEntrenador(entrenador);
+
+						refrescarCliente();
+						refrescarEntrenador();
+						limpiarCliente();
+						limpiarEntrenador();
+						JOptionPane.showMessageDialog(frame, "Cliente asigando al entrenador");
+					}
 				}
 			}
 		});
@@ -1111,25 +1176,36 @@ public class App {
 		btnDesasignarCliente.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				idCliente = Integer.parseInt(txtIdCliente.getText());
-				Cliente cliente = clienteDAO.selectClienteById(idCliente);
 
-				if (cliente.getIdEntrenador() == 100000) {
+				if (txtIdCliente.getText() == null || txtIdCliente.getText().isEmpty()) {
 
-					JOptionPane.showMessageDialog(null, "Este cliente aun no tiene entrenador", "ERROR",
+					JOptionPane.showMessageDialog(null, "Primero selecciona un cliente de la tabla clientes", "ERROR",
 							JOptionPane.ERROR_MESSAGE);
 
 				} else {
-					idEntrenador = cliente.getIdEntrenador();
-					Entrenador entrenador = entrenadorDAO.selectEntrenadorById(idEntrenador);
-					entrenador.setNumClientes(entrenador.getNumClientes() - 1);
-					cliente.setIdEntrenador(100000);
-					clienteDAO.updateCliente(cliente);
-					entrenadorDAO.updateEntrenador(entrenador);
-					refrescarEntrenador();
-					refrescarCliente();
-					limpiarCliente();
-					limpiarEntrenador();
+
+					idCliente = Integer.parseInt(txtIdCliente.getText());
+					Cliente cliente = clienteDAO.selectClienteById(idCliente);
+
+					if (cliente.getIdEntrenador() == 100000) {
+
+						JOptionPane.showMessageDialog(null, "Este cliente aun no tiene entrenador", "ERROR",
+								JOptionPane.ERROR_MESSAGE);
+
+					} else {
+						idEntrenador = cliente.getIdEntrenador();
+						Entrenador entrenador = entrenadorDAO.selectEntrenadorById(idEntrenador);
+						entrenador.setNumClientes(entrenador.getNumClientes() - 1);
+						cliente.setIdEntrenador(100000);
+						clienteDAO.updateCliente(cliente);
+						entrenadorDAO.updateEntrenador(entrenador);
+						refrescarEntrenador();
+						refrescarCliente();
+						limpiarCliente();
+						limpiarEntrenador();
+
+						JOptionPane.showMessageDialog(frame, "Cliente desasignado del entrenador");
+					}
 				}
 			}
 		});
@@ -1161,7 +1237,7 @@ public class App {
 			}
 		});
 
-		btnFoto.setBounds(473, 757, 175, 25);
+		btnFoto.setBounds(465, 784, 175, 25);
 		frame.getContentPane().add(btnFoto);
 
 		// Botones info
@@ -1329,8 +1405,56 @@ public class App {
 		});
 		btnInfoBorrEj.setBounds(446, 627, 38, 25);
 		frame.getContentPane().add(btnInfoBorrEj);
+
+	
+
+		// botones limpiar
 		
-		
+		JButton btnLimpiarEntr = new JButton("Limpiar");
+		btnLimpiarEntr.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				txtIdEntrenador.setText("");
+				txtNombreEntrenador.setText("");
+				txtNumClientes.setText("");
+			}
+		});
+		btnLimpiarEntr.setBounds(12, 344, 117, 25);
+		frame.getContentPane().add(btnLimpiarEntr);
+
+		JButton btnLimpiarEj = new JButton("Limpiar");
+		btnLimpiarEj.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				txtidEjercicio.setText("");
+				txtNombreEjercicio.setText("");
+				txtPesoEjercicio.setText("");
+				txtSeriesEjercicio.setText("");
+				txtRepsEjercicio.setText("");
+				txtDescansoEjercicio.setText("");
+				txtFoto.setText("");
+
+			}
+		});
+		btnLimpiarEj.setBounds(501, 725, 117, 25);
+		frame.getContentPane().add(btnLimpiarEj);
+
+		JButton btnLimpiarCl = new JButton("Limpiar ");
+		btnLimpiarCl.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+				txtIdCliente.setText("");
+				txtNombreCliente.setText("");
+				txtApellidosCliente.setText("");
+				txtFechaNacCliente.setText("");
+				txtLesionesCliente.setText("");
+				txtObjCliente.setText("");
+			}
+		});
+		btnLimpiarCl.setBounds(980, 411, 117, 25);
+		frame.getContentPane().add(btnLimpiarCl);
 
 		// Mostrar las tres tablas
 
