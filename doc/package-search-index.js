@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.hibernate"},{"l":"com.hibernate.dao"},{"l":"com.hibernate.model"},{"l":"com.hibernate.util"},{"l":"pruebas"}];updateSearchResults();
