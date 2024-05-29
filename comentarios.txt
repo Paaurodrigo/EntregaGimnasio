@@ -1,0 +1,4 @@
+Nota: 1.25
+
+  Todo correcto: pruebas, ejecución, diseño, documentación, manual... No he encontrado ningún error al probarlo ni ningún fallo destacable en el código.
+  Buen trabajo! Has realizado una aplicación bastante compleja, interfaz ordenada y funcional, y el proyecto en general está bien estructurado.
